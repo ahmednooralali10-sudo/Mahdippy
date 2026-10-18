@@ -1,0 +1,12 @@
+{
+  "builds": [
+    { "src": "api.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/shorten", "dest": "/api.js" },
+    { "src": "/api/track",   "dest": "/api.js" },
+    { "src": "/",            "dest": "/index.html" },
+    { "src": "/([a-z0-9]{6,8})$", "dest": "/index.html" }
+  ]
+}
