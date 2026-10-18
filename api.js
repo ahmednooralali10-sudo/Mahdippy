@@ -1,11 +1,8 @@
 // Short-link + visitor tracker.
-// Storage: Upstash Redis REST (Vercel KV env vars supported).
-// Routes: /api/shorten (create), /api/track (collect + forward).
+// Storage: kvdb.io (free, no signup). Env: KVDB_BUCKET, WEBHOOK_URL.
 
-const KV_URL =
-  process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || null;
-const KV_TOKEN =
-  process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || null;
+const BUCKET = process.env.KVDB_BUCKET || null;
+const KVDB_BASE = 'https://kvdb.io';
 
 const CODE_CHARS = 'abcdefghijkmnpqrstuvwxyz23456789';
 const CODE_LEN = 7;
@@ -20,26 +17,32 @@ function generateCode() {
 }
 
 async function kvGet(key) {
-  if (!KV_URL || !KV_TOKEN) return null;
+  if (!BUCKET) return null;
   try {
-    const r = await fetch(KV_URL + '/get/' + encodeURIComponent(key), {
-      headers: { Authorization: 'Bearer ' + KV_TOKEN },
-    });
-    const j = await r.json();
-    if (!j || j.result == null) return null;
-    return typeof j.result === 'string' ? JSON.parse(j.result) : j.result;
+    const r = await fetch(
+      KVDB_BASE + '/' + encodeURIComponent(BUCKET) + '/' + encodeURIComponent(key),
+      { cache: 'no-store' }
+    );
+    if (!r.ok) return null;
+    const text = await r.text();
+    if (!text) return null;
+    return JSON.parse(text);
   } catch {
     return null;
   }
 }
 
 async function kvSet(key, value, ttl = LINK_TTL) {
-  if (!KV_URL || !KV_TOKEN) return false;
+  if (!BUCKET) return false;
   try {
-    const enc = encodeURIComponent(JSON.stringify(value));
     const r = await fetch(
-      KV_URL + '/setex/' + encodeURIComponent(key) + '/' + ttl + '/' + enc,
-      { method: 'POST', headers: { Authorization: 'Bearer ' + KV_TOKEN } }
+      KVDB_BASE + '/' + encodeURIComponent(BUCKET) + '/' + encodeURIComponent(key) +
+        '?ttl=' + ttl,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(value),
+      }
     );
     return r.ok;
   } catch {
@@ -176,10 +179,9 @@ async function handleShorten(req, res) {
   if (!webhook || !/^https?:\/\//i.test(webhook)) {
     return res.status(400).json({ error: 'رابط ويب هوك غير صالح' });
   }
-  if (!KV_URL || !KV_TOKEN) {
+  if (!BUCKET) {
     return res.status(500).json({
-      error:
-        'التخزين غير مهيّأ. أضف KV_REST_API_URL و KV_REST_API_TOKEN (Upstash Redis).',
+      error: 'التخزين غير مهيّأ. أضف KVDB_BUCKET في Environment Variables.',
     });
   }
 
@@ -195,7 +197,7 @@ async function handleShorten(req, res) {
     d: decoy,
     t: Date.now(),
   });
-  if (!ok) return res.status(500).json({ error: 'فشل حفظ الرابط' });
+json  if (!ok) return res.status(500).json({ error: 'فشل حفظ الرابط في kvdb' });
 
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host =
@@ -206,7 +208,7 @@ async function handleShorten(req, res) {
 }
 
 async function handleTrack(req, res) {
-  const body = req.body || {};
+  const({ body error = req.body || {};
   const code = body.code;
   if (!code) return res.status(400).json({ error: 'missing code' });
 
@@ -214,7 +216,7 @@ async function handleTrack(req, res) {
   if (!entry) {
     return res
       .status(404)
-      .json({ error: 'unknown code', redirect: 'https://www.google.com' });
+      .: 'unknown code', redirect: 'https://www.google.com' });
   }
 
   const server = await enrichServer(req.headers);
